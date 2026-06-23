@@ -287,8 +287,8 @@ body {
       <div class="setting-field">
         <label class="setting-label" for="method-select">Méthode de calcul</label>
         <select class="setting-select" id="method-select" aria-label="Choix de la méthode de calcul">
-          <option value="MWL">Muslim World League — 18° / 17°</option>
           <option value="ISNA">ISNA (Amérique du Nord) — 15° / 15°</option>
+          <option value="MWL">Muslim World League — 18° / 17°</option>
           <option value="EGYPT">Autorité égyptienne — 19,5° / 17,5°</option>
           <option value="UMM_AL_QURA">Umm Al-Qura (La Mecque) — 18,5° / 90 min</option>
           <option value="KARACHI">Université de Karachi — 18° / 18°</option>
@@ -374,8 +374,8 @@ const CITIES = [
 ];
 
 const METHODS = {
-  MWL:         { fajr: 18,   ishaMode: 'angle',   isha: 17,   ishaMinutes: 0  },
   ISNA:        { fajr: 15,   ishaMode: 'angle',   isha: 15,   ishaMinutes: 0  },
+  MWL:         { fajr: 18,   ishaMode: 'angle',   isha: 17,   ishaMinutes: 0  },
   EGYPT:       { fajr: 19.5, ishaMode: 'angle',   isha: 17.5, ishaMinutes: 0  },
   UMM_AL_QURA: { fajr: 18.5, ishaMode: 'minutes', isha: 0,    ishaMinutes: 90 },
   KARACHI:     { fajr: 18,   ishaMode: 'angle',   isha: 18,   ishaMinutes: 0  },
@@ -395,7 +395,7 @@ const PRAYER_INFO = {
 
 const state = {
   location: null,
-  method: 'MWL',
+  method: 'ISNA',
   prayerTimes: null,
   lastMinuteChecked: -1
 };
@@ -469,7 +469,7 @@ function getAsrHourAngle(date, lat, factor) {
 }
 
 function calculatePrayerTimes(date, latitude, longitude, methodKey) {
-  const method = METHODS[methodKey] || METHODS.MWL;
+  const method = METHODS[methodKey] || METHODS.ISNA;
 
   const tz  = -date.getTimezoneOffset() / 60;
   const eot = getEquationOfTime(date);
