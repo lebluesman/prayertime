@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Awqât — Heures de Prière Musulmanes</title>
+<style>
+*,
+*::before,
+*::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-deep: #050816;
+  --bg-mid: #0a0f24;
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --gold: #d4af37;
+  --gold-bright: #f4d35e;
+  --gold-soft: rgba(212, 175, 55, 0.4);
+  --gold-glow: rgba(244, 211, 94, 0.25);
+  --text: #f8f9fc;
+  --text-muted: #8b95b7;
+  --text-dim: #5a6285;
+  --danger: #e94560;
+}
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  line-height: 1.5;
+}
+
+.bg-effects {
+  position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  background:
+    radial-gradient(ellipse at top, #0d1845 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, #1a1340 0%, transparent 60%),
+    var(--bg-deep);
+}
+.stars { position: absolute; inset: 0; }
+.star {
+  position: absolute; background: white; border-radius: 50%;
+  animation: twinkle ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.moon-container {
+  position: absolute; top: 6%; right: 6%; width: 70px; height: 70px;
+  filter: drop-shadow(0 0 25px rgba(244, 211, 94, 0.45)); opacity: 0.85;
+}
+.moon-disc {
+  width: 70px; height: 70px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f4d35e, #d4af37 60%, #b8860b);
+  position: absolute; top: 0; left: 0;
+}
+.moon-shadow {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--bg-deep); position: absolute; top: 5px; left: 14px;
+}
+.glow { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; pointer-events: none; }
+.glow-1 { width: 500px; height: 500px; background: var(--gold); top: -150px; left: -150px; }
+.glow-2 { width: 450px; height: 450px; background: #1e3a8a; bottom: -100px; right: -100px; opacity: 0.4; }
+
+.container { max-width: 960px; margin: 0 auto; padding: 32px 20px 60px; position: relative; }
+
+.header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+.header-brand { display: flex; flex-direction: column; }
+.title {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(32px, 8vw, 44px); font-weight: 300; letter-spacing: 6px;
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; line-height: 1;
+}
+.title-divider { width: 50px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); margin: 14px 0 10px; }
+.subtitle { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--text-muted); }
+.location-pill {
+  display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted);
+  background: var(--bg-card); border: 1px solid var(--border); padding: 10px 16px;
+  border-radius: 100px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+}
+.location-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  box-shadow: 0 0 10px var(--gold); animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+
+.clock-section { text-align: center; margin-bottom: 40px; }
+.clock-time {
+  font-size: clamp(48px, 13vw, 88px); font-weight: 200; letter-spacing: 6px;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, #ffffff 0%, #8b95b7 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent; line-height: 1;
+}
+.clock-date { font-size: 12px; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; margin-top: 12px; }
+
+.next-prayer-card {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 24px; padding: 32px 24px;
+  text-align: center; margin-bottom: 36px; position: relative; overflow: hidden;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  animation: gentle-pulse 4s ease-in-out infinite;
+}
+@keyframes gentle-pulse {
+  0%, 100% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.15); }
+  50% { box-shadow: 0 0 80px rgba(212, 175, 55, 0.3); }
+}
+.next-prayer-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--gold-glow), transparent 70%); pointer-events: none;
+}
+.next-prayer-card::after {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.next-prayer-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; position: relative; }
+.next-prayer-name {
+  font-family: 'Georgia', serif; font-size: clamp(32px, 8vw, 48px); font-weight: 300;
+  margin-bottom: 8px; position: relative;
+  background: linear-gradient(135deg, #fff, var(--gold-bright));
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+}
+.next-prayer-time { font-size: 14px; color: var(--text-muted); font-variant-numeric: tabular-nums; margin-bottom: 16px; position: relative; letter-spacing: 2px; }
+.next-prayer-countdown { font-size: clamp(16px, 4vw, 20px); color: var(--gold-bright); font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: 2px; position: relative; }
+.next-prayer-countdown .arrow { display: inline-block; margin-right: 6px; animation: arrow-blink 1.5s ease-in-out infinite; }
+@keyframes arrow-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.prayers-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 32px; }
+@media (min-width: 600px) { .prayers-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .prayers-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.prayer-card {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 22px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
+  animation: card-enter 0.6s ease-out backwards;
+}
+@keyframes card-enter { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.prayer-card:nth-child(1) { animation-delay: 0.05s; }
+.prayer-card:nth-child(2) { animation-delay: 0.1s; }
+.prayer-card:nth-child(3) { animation-delay: 0.15s; }
+.prayer-card:nth-child(4) { animation-delay: 0.2s; }
+.prayer-card:nth-child(5) { animation-delay: 0.25s; }
+.prayer-card:nth-child(6) { animation-delay: 0.3s; }
+.prayer-card:hover { background: var(--bg-card-hover); transform: translateY(-3px); border-color: var(--border-strong); }
+.prayer-card.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.06) 100%);
+  border-color: rgba(212, 175, 55, 0.55); box-shadow: 0 8px 30px rgba(212, 175, 55, 0.18);
+}
+.prayer-card.active::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), transparent);
+}
+.prayer-card.active::after {
+  content: '●'; position: absolute; top: 14px; right: 16px; color: var(--gold-bright);
+  font-size: 8px; animation: pulse-dot 2s ease-in-out infinite;
+}
+.prayer-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+.prayer-card.active .prayer-label { color: var(--gold); }
+.prayer-time {
+  font-family: 'Georgia', serif; font-size: clamp(24px, 6vw, 30px); font-weight: 300;
+  font-variant-numeric: tabular-nums; color: var(--text); margin-bottom: 6px; letter-spacing: 1px;
+}
+.prayer-card.active .prayer-time { color: var(--gold-bright); }
+.prayer-arabic { font-size: 16px; color: var(--text-dim); direction: rtl; margin-bottom: 2px; }
+.prayer-card.active .prayer-arabic { color: var(--gold-soft); }
+.prayer-name-en { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; }
+
+.settings-panel {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 20px;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.settings-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.setting-field { flex: 1; min-width: 220px; }
+.setting-label { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+.setting-select, .setting-input {
+  width: 100%; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border); color: var(--text);
+  padding: 11px 14px; border-radius: 10px; font-size: 13px; font-family: inherit; cursor: pointer;
+  transition: border-color 0.2s; appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; padding-right: 36px;
+}
+.setting-select:focus, .setting-input:focus { outline: none; border-color: var(--gold); }
+.btn {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-bright) 100%);
+  color: var(--bg-deep); border: none; padding: 12px 22px; border-radius: 10px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px; cursor: pointer;
+  transition: all 0.25s ease; text-transform: uppercase; font-family: inherit; white-space: nowrap;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--gold-glow); }
+.btn:active { transform: translateY(0); }
+
+.manual-form {
+  background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px;
+  margin-top: 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.manual-form-title { font-size: 13px; font-weight: 500; margin-bottom: 4px; color: var(--text); letter-spacing: 1px; }
+.manual-form-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+.form-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.form-field { flex: 1; min-width: 140px; }
+.form-field-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block; }
+.form-field input {
+  width: 100%; background: rgba(0, 0, 0, 0.35); border: 1px solid var(--border); color: var(--text);
+  padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.2s;
+}
+.form-field input:focus { outline: none; border-color: var(--gold); }
+
+.error-message {
+  background: rgba(233, 69, 96, 0.1); border: 1px solid rgba(233, 69, 96, 0.3); color: #ff8fa3;
+  padding: 14px 18px; border-radius: 14px; margin-top: 16px; font-size: 13px; text-align: center; line-height: 1.5;
+}
+
+.footer-note { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 32px; letter-spacing: 1px; line-height: 1.6; }
+.hidden { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-effects" aria-hidden="true">
+  <div class="stars" id="stars"></div>
+  <div class="moon-container">
+    <div class="moon-disc"></div>
+    <div class="moon-shadow"></div>
+  </div>
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+</div>
+
+<main class="container">
+
+  <header class="header">
+    <div class="header-brand">
+      <h1 class="title">Awqât</h1>
+      <div class="title-divider"></div>
+      <p class="subtitle">Heures de prière en temps réel</p>
+    </div>
+    <div class="location-pill" id="location-pill">
+      <span class="location-dot"></span>
+      <span id="location-text">Localisation en cours…</span>
+    </div>
+  </header>
+
+  <section class="clock-section" aria-label="Horloge actuelle">
+    <div class="clock-time" id="clock-time">--:--:--</div>
+    <div class="clock-date" id="clock-date">—</div>
+  </section>
+
+  <section class="next-prayer-card" aria-label="Prochaine prière">
+    <div class="next-prayer-label">Prochaine prière</div>
+    <div class="next-prayer-name" id="next-prayer-name">—</div>
+    <div class="next-prayer-time" id="next-prayer-time">--:--</div>
+    <div class="next-prayer-countdown" id="next-prayer-countdown">
+      <span class="arrow">→</span>dans --h --m --s
+    </div>
+  </section>
+
+  <section class="prayers-grid" id="prayers-grid" aria-label="Horaires des prières"></section>
+
+  <section class="settings-panel" aria-label="Paramètres de calcul">
+    
+    <div class="settings-row" style="margin-bottom: 15px;">
+      <div class="setting-field" style="min-width: 100%;">
+        <label class="setting-label" for="city-select">Choisir une ville</label>
+        <select class="setting-select" id="city-select" aria-label="Choisir une ville prédéfinie">
+          <option value="">-- Sélectionner une ville --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-row">
+      <div class="setting-field">
+        <label class="setting-label" for="method-select">Méthode de calcul</label>
+        <select class="setting-select" id="method-select" aria-label="Choix de la méthode de calcul">
+          <option value="MWL">Muslim World League — 18° / 17°</option>
+          <option value="ISNA">ISNA (Amérique du Nord) — 15° / 15°</option>
+          <option value="EGYPT">Autorité égyptienne — 19,5° / 17,5°</option>
+          <option value="UMM_AL_QURA">Umm Al-Qura (La Mecque) — 18,5° / 90 min</option>
+          <option value="KARACHI">Université de Karachi — 18° / 18°</option>
+          <option value="DUBAI">Dubaï — 18,2° / 18,2°</option>
+          <option value="KUWAIT">Koweït — 18° / 17,5°</option>
+          <option value="QATAR">Qatar — 18° / 90 min</option>
+        </select>
+      </div>
+      <button class="btn" id="relocate-btn" type="button">GPS</button>
+    </div>
+  </section>
+
+  <section class="manual-form hidden" id="manual-form" aria-label="Saisie manuelle des coordonnées">
+    <h2 class="manual-form-title">Saisie manuelle des coordonnées</h2>
+    <p class="manual-form-desc">Entrez votre latitude et votre longitude en degrés décimaux.</p>
+    <div class="form-row">
+      <div class="form-field">
+        <label class="form-field-label" for="manual-lat">Latitude</label>
+        <input type="number" id="manual-lat" step="0.0001" min="-90" max="90" placeholder="ex : 48,8566">
+      </div>
+      <div class="form-field">
+        <label class="form-field-label" for="manual-lng">Longitude</label>
+        <input type="number" id="manual-lng" step="0.0001" min="-180" max="180" placeholder="ex : 2,3522">
+      </div>
+    </div>
+    <button class="btn" id="manual-submit" type="button">Calculer</button>
+  </section>
+
+  <div class="error-message hidden" id="error-message" role="alert"></div>
+
+  <p class="footer-note">
+    Calculs astronomiques effectués localement (déclinaison solaire, équation du temps, angles horaires).<br>
+    Aucune donnée n'est envoyée vers un serveur externe.
+  </p>
+
+</main>
+
+<script>
+'use strict';
+
+// Liste des grandes villes pour le menu déroulant
+const CITIES = [
+  // Canada
+  { name: 'Montréal, Canada', lat: 45.5019, lng: -73.5674 },
+  { name: 'Toronto, Canada', lat: 43.6532, lng: -79.3832 },
+  { name: 'Ottawa, Canada', lat: 45.4215, lng: -75.6972 },
+  { name: 'Québec, Canada', lat: 46.8139, lng: -71.2080 },
+  { name: 'Vancouver, Canada', lat: 49.2827, lng: -123.1207 },
+  { name: 'Calgary, Canada', lat: 51.0447, lng: -114.0719 },
+  { name: 'Edmonton, Canada', lat: 53.5461, lng: -113.4938 },
+  // France
+  { name: 'Paris, France', lat: 48.8566, lng: 2.3522 },
+  { name: 'Marseille, France', lat: 43.2965, lng: 5.3698 },
+  { name: 'Lyon, France', lat: 45.7640, lng: 4.8357 },
+  { name: 'Toulouse, France', lat: 43.6047, lng: 1.4442 },
+  { name: 'Bordeaux, France', lat: 44.8378, lng: -0.5792 },
+  { name: 'Lille, France', lat: 50.6292, lng: 3.0573 },
+  { name: 'Nantes, France', lat: 47.2184, lng: -1.5536 },
+  { name: 'Strasbourg, France', lat: 48.5734, lng: 7.7521 },
+  { name: 'Nice, France', lat: 43.7102, lng: 7.2620 },
+  // Maghreb
+  { name: 'Casablanca, Maroc', lat: 33.5731, lng: -7.5898 },
+  { name: 'Rabat, Maroc', lat: 34.0209, lng: -6.8416 },
+  { name: 'Marrakech, Maroc', lat: 31.6295, lng: -7.9811 },
+  { name: 'Alger, Algérie', lat: 36.7538, lng: 3.0588 },
+  { name: 'Oran, Algérie', lat: 35.6976, lng: -0.6337 },
+  { name: 'Constantine, Algérie', lat: 36.3650, lng: 6.6147 },
+  { name: 'Tunis, Tunisie', lat: 36.8065, lng: 10.1815 },
+  // Moyen-Orient
+  { name: 'La Mecque, Arabie Saoudite', lat: 21.3891, lng: 39.8579 },
+  { name: 'Médine, Arabie Saoudite', lat: 24.5247, lng: 39.5692 },
+  { name: 'Riyad, Arabie Saoudite', lat: 24.7136, lng: 46.6753 },
+  { name: 'Dubaï, EAU', lat: 25.2048, lng: 55.2708 },
+  { name: 'Le Caire, Égypte', lat: 30.0444, lng: 31.2357 },
+  // Europe
+  { name: 'Londres, UK', lat: 51.5074, lng: -0.1278 },
+  { name: 'Bruxelles, Belgique', lat: 50.8503, lng: 4.3517 },
+  { name: 'Genève, Suisse', lat: 46.2044, lng: 6.1432 },
+  { name: 'Berlin, Allemagne', lat: 52.5200, lng: 13.4050 },
+  // USA
+  { name: 'New York, USA', lat: 40.7128, lng: -74.0060 },
+  { name: 'Washington, USA', lat: 38.9072, lng: -77.0369 }
+];
+
+const METHODS = {
+  MWL:         { fajr: 18,   ishaMode: 'angle',   isha: 17,   ishaMinutes: 0  },
+  ISNA:        { fajr: 15,   ishaMode: 'angle',   isha: 15,   ishaMinutes: 0  },
+  EGYPT:       { fajr: 19.5, ishaMode: 'angle',   isha: 17.5, ishaMinutes: 0  },
+  UMM_AL_QURA: { fajr: 18.5, ishaMode: 'minutes', isha: 0,    ishaMinutes: 90 },
+  KARACHI:     { fajr: 18,   ishaMode: 'angle',   isha: 18,   ishaMinutes: 0  },
+  DUBAI:       { fajr: 18.2, ishaMode: 'angle',   isha: 18.2, ishaMinutes: 0  },
+  KUWAIT:      { fajr: 18,   ishaMode: 'angle',   isha: 17.5, ishaMinutes: 0  },
+  QATAR:       { fajr: 18,   ishaMode: 'minutes', isha: 0,    ishaMinutes: 90 }
+};
+
+const PRAYER_INFO = {
+  fajr:    { name: 'Fajr',    arabic: 'الفجر',   desc: 'Aube' },
+  shuruq:  { name: 'Shuruq',  arabic: 'الشروق',  desc: 'Lever du soleil' },
+  dhuhr:   { name: 'Dhuhr',   arabic: 'الظهر',   desc: 'Midi' },
+  asr:     { name: 'Asr',     arabic: 'العصر',   desc: 'Après-midi' },
+  maghrib: { name: 'Maghrib', arabic: 'المغرب',  desc: 'Coucher du soleil' },
+  isha:    { name: 'Isha',    arabic: 'العشاء',  desc: 'Nuit' }
+};
+
+const state = {
+  location: null,
+  method: 'MWL',
+  prayerTimes: null,
+  lastMinuteChecked: -1
+};
+
+function getDayOfYear(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date - start;
+  return Math.floor(diff / 86400000);
+}
+
+function getYearFraction(date) {
+  return (2 * Math.PI / 365) * (getDayOfYear(date) - 1);
+}
+
+function getSolarDeclination(date) {
+  const g = getYearFraction(date);
+  const declRad =
+      0.006918
+    - 0.399912 * Math.cos(g)
+    + 0.070257 * Math.sin(g)
+    - 0.006758 * Math.cos(2 * g)
+    + 0.000907 * Math.sin(2 * g)
+    - 0.002697 * Math.cos(3 * g)
+    + 0.001480 * Math.sin(3 * g);
+  return declRad * 180 / Math.PI;
+}
+
+function getEquationOfTime(date) {
+  const g = getYearFraction(date);
+  return 229.18 * (
+      0.000075
+    + 0.001868 * Math.cos(g)
+    - 0.032077 * Math.sin(g)
+    - 0.014615 * Math.cos(2 * g)
+    - 0.040849 * Math.sin(2 * g)
+  );
+}
+
+function getHourAngle(date, lat, elev) {
+  const decl = getSolarDeclination(date) * Math.PI / 180;
+  const phi  = lat * Math.PI / 180;
+  const h    = elev * Math.PI / 180;
+
+  const cosPhi = Math.cos(phi);
+  const cosDecl = Math.cos(decl);
+  
+  if (Math.abs(cosPhi) < 1e-6 || Math.abs(cosDecl) < 1e-6) return null;
+
+  const cosH = (Math.sin(h) - Math.sin(phi) * Math.sin(decl)) / (cosPhi * cosDecl);
+
+  if (cosH > 1 || cosH < -1) return null; 
+  
+  return Math.acos(cosH) * 180 / Math.PI;
+}
+
+function getAsrHourAngle(date, lat, factor) {
+  const decl = getSolarDeclination(date) * Math.PI / 180;
+  const phi  = lat * Math.PI / 180;
+
+  const diff = Math.abs(phi - decl);
+  if (diff > Math.PI / 2 - 0.001) return null;
+
+  const altitude = Math.atan(1 / (factor + Math.tan(diff)));
+  const cosPhi = Math.cos(phi);
+  if (Math.abs(cosPhi) < 1e-6) return null;
+
+  const cosH = (Math.sin(altitude) - Math.sin(phi) * Math.sin(decl)) / (cosPhi * Math.cos(decl));
+
+  if (cosH > 1 || cosH < -1) return null;
+  return Math.acos(cosH) * 180 / Math.PI;
+}
+
+function calculatePrayerTimes(date, latitude, longitude, methodKey) {
+  const method = METHODS[methodKey] || METHODS.MWL;
+
+  const tz  = -date.getTimezoneOffset() / 60;
+  const eot = getEquationOfTime(date);
+
+  const noonUTC = 720 - 4 * longitude - eot;
+  const noon    = noonUTC + tz * 60;
+
+  const SUN_ANGLE = -0.833;
+
+  const fajrHA    = getHourAngle(date, latitude, -method.fajr);
+  const shuruqHA  = getHourAngle(date, latitude, SUN_ANGLE);
+  const maghribHA = getHourAngle(date, latitude, SUN_ANGLE);
+  const asrHA     = getAsrHourAngle(date, latitude, 1); // Shafi'i standard
+
+  // --- CONVERSION EN MINUTES DEPUIS MINUIT ---
+  // 1 degré d'angle horaire = 4 minutes de temps.
+  // On MULTIPLIE par 4 (et on ne divise PLUS par 15).
+  
+  const shuruq = noon - (shuruqHA !== null ? shuruqHA * 4 : 0);
+  const maghrib = noon + (maghribHA !== null ? maghribHA * 4 : 0);
+
+  let fajr;
+  if (fajrHA !== null) {
+    fajr = noon - fajrHA * 4;
+  } else {
+    fajr = shuruq - 90;
+  }
+
+  const dhuhr = noon + 1;
+
+  const asr = noon + (asrHA !== null ? asrHA * 4 : 0);
+
+  let isha;
+  if (method.ishaMode === 'angle') {
+    const ishaHA = getHourAngle(date, latitude, -method.isha);
+    if (ishaHA !== null) {
+      isha = noon + ishaHA * 4;
+    } else {
+      isha = maghrib + 90;
+    }
+  } else {
+    isha = maghrib + method.ishaMinutes;
+  }
+
+  return { fajr, shuruq, dhuhr, asr, maghrib, isha };
+}
+
+function minutesToTime(minutes) {
+  while (minutes < 0) minutes += 1440;
+  while (minutes >= 1440) minutes -= 1440;
+  const h = Math.floor(minutes / 60);
+  const m = Math.floor(minutes % 60);
+  return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+}
+
+function formatCountdown(diffMinutes) {
+  const totalSec = Math.max(0, Math.floor(diffMinutes * 60));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  if (h > 0) return pad(h) + 'h ' + pad(m) + 'm ' + pad(s) + 's';
+  return pad(m) + 'm ' + pad(s) + 's';
+}
+
+function getNextPrayer(times, now) {
+  const nowMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+  const order = ['fajr', 'shuruq', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+  for (const key of order) {
+    if (times[key] > nowMin) {
+      return {
+        key,
+        name: PRAYER_INFO[key].name,
+        arabic: PRAYER_INFO[key].arabic,
+        time: times[key],
+        diff: times[key] - nowMin,
+        isTomorrow: false
+      };
+    }
+  }
+
+  return {
+    key: 'fajr',
+    name: PRAYER_INFO.fajr.name,
+    arabic: PRAYER_INFO.fajr.arabic,
+    time: times.fajr + 1440,
+    diff: times.fajr + 1440 - nowMin,
+    isTomorrow: true
+  };
+}
+
+function requestLocation() {
+  if (!navigator.geolocation) {
+    showError("Votre navigateur ne supporte pas la géolocalisation. Veuillez saisir vos coordonnées manuellement.");
+    showManualForm();
+    setLocationText('Localisation requise');
+    return;
+  }
+
+  setLocationText('Localisation GPS en cours…');
+  hideError();
+
+  const options = {
+    enableHighAccuracy: true, 
+    timeout: 15000,           
+    maximumAge: 0             
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      state.location = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      document.getElementById('city-select').value = ""; // Reset city dropdown
+      updateLocationDisplay();
+      refreshPrayerTimes();
+    },
+    (error) => {
+      let msg = '';
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          msg = "Accès à la localisation refusé. Sur mobile, le GPS nécessite une connexion HTTPS. Choisissez une ville ou saisissez vos coordonnées.";
+          break;
+        case error.POSITION_UNAVAILABLE:
+          msg = "Position GPS indisponible. Vérifiez que le GPS de votre téléphone est allumé, ou choisissez une ville.";
+          break;
+        case error.TIMEOUT:
+          msg = "Délai GPS dépassé. Réessayez, ou choisissez une ville dans la liste.";
+          break;
+        default:
+          msg = "Erreur de localisation. Choisissez une ville ou saisissez vos coordonnées.";
+      }
+      showError(msg);
+      showManualForm();
+      setLocationText('Localisation requise');
+    },
+    options
+  );
+}
+
+function updateLocationDisplay(customName = null) {
+  if (!state.location) return;
+  if (customName) {
+    setLocationText(customName);
+  } else {
+    const lat = state.location.lat;
+    const lng = state.location.lng;
+    const latText = Math.abs(lat).toFixed(3) + '° ' + (lat >= 0 ? 'N' : 'S');
+    const lngText = Math.abs(lng).toFixed(3) + '° ' + (lng >= 0 ? 'E' : 'O');
+    setLocationText(latText + ' · ' + lngText);
+  }
+}
+
+function setLocationText(text) {
+  document.getElementById('location-text').textContent = text;
+}
+
+function showManualForm() { document.getElementById('manual-form').classList.remove('hidden'); }
+function hideManualForm() { document.getElementById('manual-form').classList.add('hidden'); }
+
+function showError(msg) {
+  const el = document.getElementById('error-message');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function hideError() { document.getElementById('error-message').classList.add('hidden'); }
+
+function refreshPrayerTimes() {
+  if (!state.location) return;
+  const now = new Date();
+  state.prayerTimes = calculatePrayerTimes(
+    now, state.location.lat, state.location.lng, state.method
+  );
+  renderPrayerCards(now);
+  updateNextPrayerDisplay(now);
+  hideError();
+}
+
+function renderPrayerCards(now) {
+  const grid = document.getElementById('prayers-grid');
+  const next = getNextPrayer(state.prayerTimes, now);
+  const order = ['fajr', 'shuruq', 'dhuhr', 'asr', 'maghrib', 'isha'];
+
+  grid.innerHTML = '';
+  order.forEach((key) => {
+    const info = PRAYER_INFO[key];
+    const time = state.prayerTimes[key];
+    const isActive = (key === next.key);
+
+    const card = document.createElement('article');
+    card.className = 'prayer-card' + (isActive ? ' active' : '');
+    card.setAttribute('aria-label', 'Prière de ' + info.name);
+
+    card.innerHTML =
+      '<div class="prayer-label">' + info.desc + '</div>' +
+      '<div class="prayer-time">' + minutesToTime(time) + '</div>' +
+      '<div class="prayer-arabic">' + info.arabic + '</div>' +
+      '<div class="prayer-name-en">' + info.name + '</div>';
+
+    grid.appendChild(card);
+  });
+}
+
+function updateNextPrayerDisplay(now) {
+  if (!state.prayerTimes) return;
+  const next = getNextPrayer(state.prayerTimes, now);
+
+  document.getElementById('next-prayer-name').textContent = next.name;
+  document.getElementById('next-prayer-time').textContent =
+    minutesToTime(next.time) + (next.isTomorrow ? ' · demain' : '');
+
+  const countdownEl = document.getElementById('next-prayer-countdown');
+  countdownEl.innerHTML = '<span class="arrow">→</span>dans ' + formatCountdown(next.diff);
+}
+
+function tick() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+
+  document.getElementById('clock-time').textContent =
+    pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+
+  const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+                  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  document.getElementById('clock-date').textContent =
+    days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+
+  if (state.prayerTimes) {
+    updateNextPrayerDisplay(now);
+
+    const currentMinute = now.getHours() * 60 + now.getMinutes();
+    if (currentMinute !== state.lastMinuteChecked) {
+      state.lastMinuteChecked = currentMinute;
+      state.prayerTimes = calculatePrayerTimes(
+        now, state.location.lat, state.location.lng, state.method
+      );
+      renderPrayerCards(now);
+    }
+  }
+}
+
+function createStars() {
+  const container = document.getElementById('stars');
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 140; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2 + 0.5;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = (Math.random() * 4) + 's';
+    star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    star.style.opacity = (Math.random() * 0.6 + 0.2).toFixed(2);
+    frag.appendChild(star);
+  }
+  container.appendChild(frag);
+}
+
+// Remplir le menu déroulant des villes
+function populateCities() {
+  const select = document.getElementById('city-select');
+  CITIES.forEach((city, index) => {
+    const opt = document.createElement('option');
+    opt.value = index;
+    opt.textContent = city.name;
+    select.appendChild(opt);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  createStars();
+  populateCities(); // Remplir la liste des villes
+  tick();
+  setInterval(tick, 1000);
+
+  // Événement de sélection de ville
+  document.getElementById('city-select').addEventListener('change', (e) => {
+    const index = parseInt(e.target.value, 10);
+    if (!isNaN(index)) {
+      const city = CITIES[index];
+      state.location = { lat: city.lat, lng: city.lng };
+      hideManualForm();
+      hideError();
+      updateLocationDisplay(city.name);
+      refreshPrayerTimes();
+    }
+  });
+
+  document.getElementById('method-select').addEventListener('change', (e) => {
+    state.method = e.target.value;
+    refreshPrayerTimes();
+  });
+
+  document.getElementById('relocate-btn').addEventListener('click', () => {
+    document.getElementById('city-select').value = ""; // Reset la ville
+    hideManualForm();
+    requestLocation();
+  });
+
+  document.getElementById('manual-submit').addEventListener('click', () => {
+    const lat = parseFloat(document.getElementById('manual-lat').value);
+    const lng = parseFloat(document.getElementById('manual-lng').value);
+
+    if (isNaN(lat) || isNaN(lng)) {
+      showError("Veuillez saisir des valeurs numériques valides.");
+      return;
+    }
+    if (lat < -90 || lat > 90) {
+      showError("La latitude doit être comprise entre -90 et 90 degrés.");
+      return;
+    }
+    if (lng < -180 || lng > 180) {
+      showError("La longitude doit être comprise entre -180 et 180 degrés.");
+      return;
+    }
+
+    state.location = { lat, lng };
+    document.getElementById('city-select').value = ""; // Reset la ville
+    hideManualForm();
+    hideError();
+    updateLocationDisplay();
+    refreshPrayerTimes();
+  });
+
+  requestLocation();
+});
+</script>
+</body>
+</html>
