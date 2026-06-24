@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Awqât — Heures de Prière Musulmanes</title>
+<title>Awqât — Moteur de Calcul Universel</title>
 <style>
 *,
 *::before,
@@ -24,6 +24,9 @@
   --text-muted: #8b95b7;
   --text-dim: #5a6285;
   --danger: #e94560;
+  --kepler: #3a86ff;
+  --cooper: #ffffff;
+  --noaa: #38b000;
 }
 
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
@@ -182,7 +185,8 @@ body {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 20px;
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
 }
-.settings-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.settings-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 15px; }
+.settings-row:last-child { margin-bottom: 0; }
 .setting-field { flex: 1; min-width: 220px; }
 .setting-label { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
 .setting-select, .setting-input {
@@ -222,6 +226,37 @@ body {
   padding: 14px 18px; border-radius: 14px; margin-top: 16px; font-size: 13px; text-align: center; line-height: 1.5;
 }
 
+.comparison-box {
+  background: rgba(58, 134, 255, 0.05);
+  border: 1px solid rgba(58, 134, 255, 0.2);
+  border-radius: 14px;
+  padding: 16px;
+  margin-top: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow-x: auto;
+}
+.comparison-title {
+  font-family: -apple-system, sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--kepler);
+  margin-bottom: 12px;
+}
+.comp-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.comp-val-kepler { color: var(--kepler); }
+.comp-val-spencer { color: var(--gold); }
+.comp-val-cooper { color: var(--cooper); }
+.comp-val-noaa { color: var(--noaa); font-weight: bold; }
+
 .footer-note { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 32px; letter-spacing: 1px; line-height: 1.6; }
 .hidden { display: none !important; }
 
@@ -248,7 +283,7 @@ body {
     <div class="header-brand">
       <h1 class="title">Awqât</h1>
       <div class="title-divider"></div>
-      <p class="subtitle">Heures de prière en temps réel</p>
+      <p class="subtitle">Moteur de Calcul Universel</p>
     </div>
     <div class="location-pill" id="location-pill">
       <span class="location-dot"></span>
@@ -285,10 +320,19 @@ body {
 
     <div class="settings-row">
       <div class="setting-field">
-        <label class="setting-label" for="method-select">Méthode de calcul</label>
+        <label class="setting-label" for="engine-select">Moteur astronomique</label>
+        <select class="setting-select" id="engine-select" aria-label="Moteur de calcul">
+          <option value="cooper">Cooper (Applications Mobiles)</option>
+          <option value="spencer">Spencer (Approximation Fourier)</option>
+          <option value="kepler">Kepler (Physique Pure - Orbite)</option>
+          <option value="noaa" selected>NOAA / SPA (Précision Maximale)</option>
+        </select>
+      </div>
+      <div class="setting-field">
+        <label class="setting-label" for="method-select">Méthode de calcul (Prière)</label>
         <select class="setting-select" id="method-select" aria-label="Choix de la méthode de calcul">
-          <option value="ISNA">ISNA (Amérique du Nord) — 15° / 15°</option>
           <option value="MWL">Muslim World League — 18° / 17°</option>
+          <option value="ISNA" selected>ISNA (Amérique du Nord) — 15° / 15°</option>
           <option value="EGYPT">Autorité égyptienne — 19,5° / 17,5°</option>
           <option value="UMM_AL_QURA">Umm Al-Qura (La Mecque) — 18,5° / 90 min</option>
           <option value="KARACHI">Université de Karachi — 18° / 18°</option>
@@ -299,6 +343,29 @@ body {
       </div>
       <button class="btn" id="relocate-btn" type="button">GPS</button>
     </div>
+
+    <div class="comparison-box" id="comparison-box">
+      <div class="comparison-title">Telescope Mathématique (Comparaison à Midi Solaire)</div>
+      <div class="comp-row">
+        <span>Déclinaison :</span>
+        <span>
+          <span class="comp-val-cooper" id="comp-decl-cooper">--</span> (C) | 
+          <span class="comp-val-spencer" id="comp-decl-spencer">--</span> (S) | 
+          <span class="comp-val-kepler" id="comp-decl-kepler">--</span> (K) |
+          <span class="comp-val-noaa" id="comp-decl-noaa">--</span> (N)
+        </span>
+      </div>
+      <div class="comp-row">
+        <span>Équation du Temps :</span>
+        <span>
+          <span class="comp-val-cooper" id="comp-eot-cooper">--</span> (C) | 
+          <span class="comp-val-spencer" id="comp-eot-spencer">--</span> (S) | 
+          <span class="comp-val-kepler" id="comp-eot-kepler">--</span> (K) |
+          <span class="comp-val-noaa" id="comp-eot-noaa">--</span> (N)
+        </span>
+      </div>
+    </div>
+
   </section>
 
   <section class="manual-form hidden" id="manual-form" aria-label="Saisie manuelle des coordonnées">
@@ -320,8 +387,8 @@ body {
   <div class="error-message hidden" id="error-message" role="alert"></div>
 
   <p class="footer-note">
-    Calculs astronomiques effectués localement (déclinaison solaire, équation du temps, angles horaires).<br>
-    Aucune donnée n'est envoyée vers un serveur externe.
+    Moteurs : Cooper (PrayTimes), Spencer (Fourier), Kepler (Newton-Raphson), NOAA (NREL SPA).<br>
+    Calculs 100% locaux. Aucune donnée envoyée vers un serveur externe.
   </p>
 
 </main>
@@ -329,7 +396,6 @@ body {
 <script>
 'use strict';
 
-// Liste des grandes villes pour le menu déroulant
 const CITIES = [
   // Canada
   { name: 'Montréal, Canada', lat: 45.5019, lng: -73.5674 },
@@ -374,8 +440,8 @@ const CITIES = [
 ];
 
 const METHODS = {
-  ISNA:        { fajr: 15,   ishaMode: 'angle',   isha: 15,   ishaMinutes: 0  },
   MWL:         { fajr: 18,   ishaMode: 'angle',   isha: 17,   ishaMinutes: 0  },
+  ISNA:        { fajr: 15,   ishaMode: 'angle',   isha: 15,   ishaMinutes: 0  },
   EGYPT:       { fajr: 19.5, ishaMode: 'angle',   isha: 17.5, ishaMinutes: 0  },
   UMM_AL_QURA: { fajr: 18.5, ishaMode: 'minutes', isha: 0,    ishaMinutes: 90 },
   KARACHI:     { fajr: 18,   ishaMode: 'angle',   isha: 18,   ishaMinutes: 0  },
@@ -395,64 +461,181 @@ const PRAYER_INFO = {
 
 const state = {
   location: null,
-  method: 'ISNA',
+  method: 'ISNA', // ISNA par défaut
+  engine: 'noaa',
   prayerTimes: null,
   lastMinuteChecked: -1
 };
 
-function getDayOfYear(date) {
+/* ============================================================
+   MOTEURS ASTRONOMIQUES (COOPER, SPENCER, KEPLER, NOAA)
+   ============================================================ */
+
+const J2000 = new Date(Date.UTC(2000, 0, 1, 12, 0, 0));
+const OBLIQUITY_RAD = 23.4392911 * Math.PI / 180;
+const ECCENTRICITY = 0.016708634;
+const PERIHELION_LON_RAD = 282.937348 * Math.PI / 180;
+
+function getDaysSinceJ2000(date) {
+  return (date - J2000) / (1000 * 60 * 60 * 24);
+}
+
+// --- 1. MOTEUR COOPER ---
+function getCooperData(date) {
   const start = new Date(date.getFullYear(), 0, 0);
-  const diff = date - start;
-  return Math.floor(diff / 86400000);
+  const N = Math.floor((date - start) / 86400000);
+  
+  const decl = 23.45 * Math.sin((360 / 365) * (N + 284) * Math.PI / 180);
+  const B = (360 / 365) * (N - 81) * Math.PI / 180;
+  const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+  
+  return { declination: decl, eot: eot };
 }
 
-function getYearFraction(date) {
-  return (2 * Math.PI / 365) * (getDayOfYear(date) - 1);
+// --- 2. MOTEUR SPENCER ---
+function getSpencerData(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const N = Math.floor((date - start) / 86400000);
+  const g = (2 * Math.PI / 365) * (N - 1);
+  
+  const declRad = 0.006918 - 0.399912 * Math.cos(g) + 0.070257 * Math.sin(g)
+                - 0.006758 * Math.cos(2*g) + 0.000907 * Math.sin(2*g)
+                - 0.002697 * Math.cos(3*g) + 0.001480 * Math.sin(3*g);
+  
+  const eot = 229.18 * (0.000075 + 0.001868 * Math.cos(g) - 0.032077 * Math.sin(g)
+                       - 0.014615 * Math.cos(2*g) - 0.040849 * Math.sin(2*g));
+                       
+  return { declination: declRad * 180 / Math.PI, eot: eot };
 }
 
-function getSolarDeclination(date) {
-  const g = getYearFraction(date);
-  const declRad =
-      0.006918
-    - 0.399912 * Math.cos(g)
-    + 0.070257 * Math.sin(g)
-    - 0.006758 * Math.cos(2 * g)
-    + 0.000907 * Math.sin(2 * g)
-    - 0.002697 * Math.cos(3 * g)
-    + 0.001480 * Math.sin(3 * g);
-  return declRad * 180 / Math.PI;
+// --- 3. MOTEUR KEPLER (Physique Pure - Année Tropicale) ---
+function solveKepler(M, e) {
+  let E = M + e * Math.sin(M) * (1.0 + e * Math.cos(M));
+  let delta = 1.0;
+  let iterations = 0;
+  
+  while (Math.abs(delta) > 1e-10 && iterations < 30) {
+    delta = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E));
+    E -= delta;
+    iterations++;
+  }
+  return E;
 }
 
-function getEquationOfTime(date) {
-  const g = getYearFraction(date);
-  return 229.18 * (
-      0.000075
-    + 0.001868 * Math.cos(g)
-    - 0.032077 * Math.sin(g)
-    - 0.014615 * Math.cos(2 * g)
-    - 0.040849 * Math.sin(2 * g)
+function getKeplerData(date) {
+  const n = getDaysSinceJ2000(date);
+  
+  let M = (357.52911 + 0.98560028 * n) * Math.PI / 180;
+  M = M % (2 * Math.PI);
+  if (M < 0) M += 2 * Math.PI;
+  
+  const E = solveKepler(M, ECCENTRICITY);
+  
+  const nu = 2 * Math.atan2(
+    Math.sqrt(1 + ECCENTRICITY) * Math.sin(E / 2),
+    Math.sqrt(1 - ECCENTRICITY) * Math.cos(E / 2)
   );
+  
+  // CORRECTION MAJEURE : On utilise l'Année Tropicale (0.9856474) pour L_mean, 
+  // pour caler Kepler sur les saisons exactes et éviter la dérive par rapport à NOAA.
+  let L_mean = (280.46646 + 0.9856474 * n) * Math.PI / 180;
+  L_mean = L_mean % (2 * Math.PI);
+  if (L_mean < 0) L_mean += 2 * Math.PI;
+  
+  // La vraie longitude est L_mean + Équation du Centre (nu - M)
+  let L_true = L_mean + (nu - M);
+  L_true = L_true % (2 * Math.PI);
+  if (L_true < 0) L_true += 2 * Math.PI;
+  
+  const decl = Math.asin(Math.sin(L_true) * Math.sin(OBLIQUITY_RAD)) * 180 / Math.PI;
+  
+  let alpha_true = Math.atan2(Math.cos(OBLIQUITY_RAD) * Math.sin(L_true), Math.cos(L_true));
+  alpha_true = alpha_true % (2 * Math.PI);
+  if (alpha_true < 0) alpha_true += 2 * Math.PI;
+  if (Math.abs(L_true - alpha_true) > Math.PI) {
+    if (L_true > alpha_true) alpha_true += 2 * Math.PI;
+    else alpha_true -= 2 * Math.PI;
+  }
+  
+  // Équation du Temps = Longitude Moyenne - Ascension Droite Vraie
+  let eotRad = L_mean - alpha_true;
+  eotRad = ((eotRad + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+  
+  return { declination: decl, eot: eotRad * 180 / Math.PI * 4 };
 }
+
+// --- 4. MOTEUR NOAA / SPA ---
+function getNoaaData(date) {
+  const rad = Math.PI / 180;
+  const deg = 180 / Math.PI;
+
+  const jd = date.getTime() / 86400000 + 2440587.5;
+  const jc = (jd - 2451545.0) / 36525;
+
+  let L0 = 280.46646 + jc * (36000.76983 + jc * 0.0003032);
+  L0 = (L0 % 360 + 360) % 360;
+
+  let M = 357.52911 + jc * (35999.05029 - 0.0001537 * jc);
+  M = (M % 360 + 360) % 360;
+
+  const e = 0.016708634 - jc * (0.000042037 + 0.0000001267 * jc);
+
+  const C = Math.sin(rad * M) * (1.914602 - jc * (0.004817 + 0.000014 * jc)) +
+            Math.sin(rad * 2 * M) * (0.019993 - 0.000101 * jc) +
+            Math.sin(rad * 3 * M) * 0.000289;
+
+  const L_true = L0 + C;
+  const Omega = 125.04 - 1934.136 * jc;
+  const L_apparent = L_true - 0.00569 - 0.00478 * Math.sin(rad * Omega);
+
+  const epsilon0 = 23 + (26 + ((21.448 - jc * (46.815 + jc * (0.00059 - jc * 0.001813)))) / 60) / 60;
+  const epsilon = epsilon0 + 0.00256 * Math.cos(rad * Omega);
+
+  const decl = deg * Math.asin(Math.sin(rad * epsilon) * Math.sin(rad * L_apparent));
+
+  const y_tan = Math.tan(rad * epsilon / 2);
+  const y_sq = y_tan * y_tan;
+  const EoT = 4 * deg * (y_sq * Math.sin(2 * rad * L0) - 2 * e * Math.sin(rad * M) + 4 * e * y_sq * Math.sin(rad * M) * Math.cos(2 * rad * L0) - 0.5 * y_sq * y_sq * Math.sin(4 * rad * L0) - 1.25 * e * e * Math.sin(2 * rad * M));
+
+  return { declination: decl, eot: EoT };
+}
+
+// --- SELECTION STRICTE DU MOTEUR ---
+function getSolarData(date) {
+  const noonDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+  
+  switch(state.engine) {
+    case 'kepler': return getKeplerData(noonDate);
+    case 'spencer': return getSpencerData(noonDate);
+    case 'noaa': return getNoaaData(noonDate);
+    case 'cooper': return getCooperData(noonDate);
+    default: return getNoaaData(noonDate);
+  }
+}
+
+/* ============================================================
+   CALCUL DES HEURES DE PRIÈRE
+   ============================================================ */
 
 function getHourAngle(date, lat, elev) {
-  const decl = getSolarDeclination(date) * Math.PI / 180;
+  const sunData = getSolarData(date);
+  const decl = sunData.declination * Math.PI / 180;
   const phi  = lat * Math.PI / 180;
   const h    = elev * Math.PI / 180;
 
   const cosPhi = Math.cos(phi);
   const cosDecl = Math.cos(decl);
-  
   if (Math.abs(cosPhi) < 1e-6 || Math.abs(cosDecl) < 1e-6) return null;
 
   const cosH = (Math.sin(h) - Math.sin(phi) * Math.sin(decl)) / (cosPhi * cosDecl);
-
   if (cosH > 1 || cosH < -1) return null; 
   
   return Math.acos(cosH) * 180 / Math.PI;
 }
 
 function getAsrHourAngle(date, lat, factor) {
-  const decl = getSolarDeclination(date) * Math.PI / 180;
+  const sunData = getSolarData(date);
+  const decl = sunData.declination * Math.PI / 180;
   const phi  = lat * Math.PI / 180;
 
   const diff = Math.abs(phi - decl);
@@ -463,59 +646,45 @@ function getAsrHourAngle(date, lat, factor) {
   if (Math.abs(cosPhi) < 1e-6) return null;
 
   const cosH = (Math.sin(altitude) - Math.sin(phi) * Math.sin(decl)) / (cosPhi * Math.cos(decl));
-
   if (cosH > 1 || cosH < -1) return null;
   return Math.acos(cosH) * 180 / Math.PI;
 }
 
 function calculatePrayerTimes(date, latitude, longitude, methodKey) {
-  const method = METHODS[methodKey] || METHODS.ISNA;
-
+  const method = METHODS[methodKey] || METHODS.ISNA; // ISNA par défaut
+  const sunData = getSolarData(date);
   const tz  = -date.getTimezoneOffset() / 60;
-  const eot = getEquationOfTime(date);
 
-  const noonUTC = 720 - 4 * longitude - eot;
+  const noonUTC = 720 - 4 * longitude - sunData.eot;
   const noon    = noonUTC + tz * 60;
 
   const SUN_ANGLE = -0.833;
-
   const fajrHA    = getHourAngle(date, latitude, -method.fajr);
   const shuruqHA  = getHourAngle(date, latitude, SUN_ANGLE);
   const maghribHA = getHourAngle(date, latitude, SUN_ANGLE);
-  const asrHA     = getAsrHourAngle(date, latitude, 1); // Shafi'i standard
+  const asrHA     = getAsrHourAngle(date, latitude, 1);
 
-  // --- CONVERSION EN MINUTES DEPUIS MINUIT ---
-  // 1 degré d'angle horaire = 4 minutes de temps.
-  // On MULTIPLIE par 4 (et on ne divise PLUS par 15).
-  
-  const shuruq = noon - (shuruqHA !== null ? shuruqHA * 4 : 0);
+  const shuruq  = noon - (shuruqHA !== null ? shuruqHA * 4 : 0);
   const maghrib = noon + (maghribHA !== null ? maghribHA * 4 : 0);
 
-  let fajr;
-  if (fajrHA !== null) {
-    fajr = noon - fajrHA * 4;
-  } else {
-    fajr = shuruq - 90;
-  }
-
+  let fajr = fajrHA !== null ? noon - fajrHA * 4 : shuruq - 90;
   const dhuhr = noon + 1;
-
   const asr = noon + (asrHA !== null ? asrHA * 4 : 0);
 
   let isha;
   if (method.ishaMode === 'angle') {
     const ishaHA = getHourAngle(date, latitude, -method.isha);
-    if (ishaHA !== null) {
-      isha = noon + ishaHA * 4;
-    } else {
-      isha = maghrib + 90;
-    }
+    isha = ishaHA !== null ? noon + ishaHA * 4 : maghrib + 90;
   } else {
     isha = maghrib + method.ishaMinutes;
   }
 
   return { fajr, shuruq, dhuhr, asr, maghrib, isha };
 }
+
+/* ============================================================
+   UI & AFFICHAGE
+   ============================================================ */
 
 function minutesToTime(minutes) {
   while (minutes < 0) minutes += 1440;
@@ -542,112 +711,77 @@ function getNextPrayer(times, now) {
   for (const key of order) {
     if (times[key] > nowMin) {
       return {
-        key,
-        name: PRAYER_INFO[key].name,
-        arabic: PRAYER_INFO[key].arabic,
-        time: times[key],
-        diff: times[key] - nowMin,
-        isTomorrow: false
+        key, name: PRAYER_INFO[key].name, arabic: PRAYER_INFO[key].arabic,
+        time: times[key], diff: times[key] - nowMin, isTomorrow: false
       };
     }
   }
-
   return {
-    key: 'fajr',
-    name: PRAYER_INFO.fajr.name,
-    arabic: PRAYER_INFO.fajr.arabic,
-    time: times.fajr + 1440,
-    diff: times.fajr + 1440 - nowMin,
-    isTomorrow: true
+    key: 'fajr', name: PRAYER_INFO.fajr.name, arabic: PRAYER_INFO.fajr.arabic,
+    time: times.fajr + 1440, diff: times.fajr + 1440 - nowMin, isTomorrow: true
   };
 }
 
 function requestLocation() {
   if (!navigator.geolocation) {
-    showError("Votre navigateur ne supporte pas la géolocalisation. Veuillez saisir vos coordonnées manuellement.");
-    showManualForm();
-    setLocationText('Localisation requise');
-    return;
+    showError("GPS non supporté. Choisissez une ville ou saisissez les coordonnées.");
+    showManualForm(); setLocationText('Requis'); return;
   }
-
-  setLocationText('Localisation GPS en cours…');
-  hideError();
-
-  const options = {
-    enableHighAccuracy: true, 
-    timeout: 15000,           
-    maximumAge: 0             
-  };
-
+  setLocationText('Localisation GPS en cours…'); hideError();
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      state.location = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-      document.getElementById('city-select').value = ""; // Reset city dropdown
-      updateLocationDisplay();
-      refreshPrayerTimes();
+      state.location = { lat: position.coords.latitude, lng: position.coords.longitude };
+      document.getElementById('city-select').value = "";
+      updateLocationDisplay(); refreshPrayerTimes();
     },
     (error) => {
-      let msg = '';
-      switch (error.code) {
-        case error.PERMISSION_DENIED:
-          msg = "Accès à la localisation refusé. Sur mobile, le GPS nécessite une connexion HTTPS. Choisissez une ville ou saisissez vos coordonnées.";
-          break;
-        case error.POSITION_UNAVAILABLE:
-          msg = "Position GPS indisponible. Vérifiez que le GPS de votre téléphone est allumé, ou choisissez une ville.";
-          break;
-        case error.TIMEOUT:
-          msg = "Délai GPS dépassé. Réessayez, ou choisissez une ville dans la liste.";
-          break;
-        default:
-          msg = "Erreur de localisation. Choisissez une ville ou saisissez vos coordonnées.";
-      }
-      showError(msg);
-      showManualForm();
-      setLocationText('Localisation requise');
+      showError("GPS bloqué (mode non-HTTPS ou refusé). Choisissez une ville ou saisissez les coordonnées.");
+      showManualForm(); setLocationText('Requis');
     },
-    options
+    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
   );
 }
 
 function updateLocationDisplay(customName = null) {
   if (!state.location) return;
-  if (customName) {
-    setLocationText(customName);
-  } else {
-    const lat = state.location.lat;
-    const lng = state.location.lng;
-    const latText = Math.abs(lat).toFixed(3) + '° ' + (lat >= 0 ? 'N' : 'S');
-    const lngText = Math.abs(lng).toFixed(3) + '° ' + (lng >= 0 ? 'E' : 'O');
-    setLocationText(latText + ' · ' + lngText);
+  if (customName) setLocationText(customName);
+  else {
+    const lat = state.location.lat, lng = state.location.lng;
+    setLocationText(Math.abs(lat).toFixed(3) + '° ' + (lat >= 0 ? 'N' : 'S') + ' · ' + Math.abs(lng).toFixed(3) + '° ' + (lng >= 0 ? 'E' : 'O'));
   }
 }
 
-function setLocationText(text) {
-  document.getElementById('location-text').textContent = text;
-}
-
+function setLocationText(t) { document.getElementById('location-text').textContent = t; }
 function showManualForm() { document.getElementById('manual-form').classList.remove('hidden'); }
 function hideManualForm() { document.getElementById('manual-form').classList.add('hidden'); }
-
-function showError(msg) {
-  const el = document.getElementById('error-message');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-}
-
+function showError(msg) { const el = document.getElementById('error-message'); el.textContent = msg; el.classList.remove('hidden'); }
 function hideError() { document.getElementById('error-message').classList.add('hidden'); }
+
+function updateComparisonBox(date) {
+  const noonDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+  const keplerData = getKeplerData(noonDate);
+  const spencerData = getSpencerData(noonDate);
+  const cooperData = getCooperData(noonDate);
+  const noaaData = getNoaaData(noonDate);
+  
+  document.getElementById('comp-decl-kepler').textContent = keplerData.declination.toFixed(5) + '°';
+  document.getElementById('comp-decl-spencer').textContent = spencerData.declination.toFixed(5) + '°';
+  document.getElementById('comp-decl-cooper').textContent = cooperData.declination.toFixed(5) + '°';
+  document.getElementById('comp-decl-noaa').textContent = noaaData.declination.toFixed(5) + '°';
+  
+  document.getElementById('comp-eot-kepler').textContent = keplerData.eot.toFixed(4);
+  document.getElementById('comp-eot-spencer').textContent = spencerData.eot.toFixed(4);
+  document.getElementById('comp-eot-cooper').textContent = cooperData.eot.toFixed(4);
+  document.getElementById('comp-eot-noaa').textContent = noaaData.eot.toFixed(4);
+}
 
 function refreshPrayerTimes() {
   if (!state.location) return;
   const now = new Date();
-  state.prayerTimes = calculatePrayerTimes(
-    now, state.location.lat, state.location.lng, state.method
-  );
+  state.prayerTimes = calculatePrayerTimes(now, state.location.lat, state.location.lng, state.method);
   renderPrayerCards(now);
   updateNextPrayerDisplay(now);
+  updateComparisonBox(now);
   hideError();
 }
 
@@ -679,37 +813,26 @@ function renderPrayerCards(now) {
 function updateNextPrayerDisplay(now) {
   if (!state.prayerTimes) return;
   const next = getNextPrayer(state.prayerTimes, now);
-
   document.getElementById('next-prayer-name').textContent = next.name;
-  document.getElementById('next-prayer-time').textContent =
-    minutesToTime(next.time) + (next.isTomorrow ? ' · demain' : '');
-
-  const countdownEl = document.getElementById('next-prayer-countdown');
-  countdownEl.innerHTML = '<span class="arrow">→</span>dans ' + formatCountdown(next.diff);
+  document.getElementById('next-prayer-time').textContent = minutesToTime(next.time) + (next.isTomorrow ? ' · demain' : '');
+  document.getElementById('next-prayer-countdown').innerHTML = '<span class="arrow">→</span>dans ' + formatCountdown(next.diff);
 }
 
 function tick() {
   const now = new Date();
   const pad = (n) => String(n).padStart(2, '0');
 
-  document.getElementById('clock-time').textContent =
-    pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-
+  document.getElementById('clock-time').textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
   const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-                  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-  document.getElementById('clock-date').textContent =
-    days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+  const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  document.getElementById('clock-date').textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
 
   if (state.prayerTimes) {
     updateNextPrayerDisplay(now);
-
     const currentMinute = now.getHours() * 60 + now.getMinutes();
     if (currentMinute !== state.lastMinuteChecked) {
       state.lastMinuteChecked = currentMinute;
-      state.prayerTimes = calculatePrayerTimes(
-        now, state.location.lat, state.location.lng, state.method
-      );
+      state.prayerTimes = calculatePrayerTimes(now, state.location.lat, state.location.lng, state.method);
       renderPrayerCards(now);
     }
   }
@@ -734,7 +857,6 @@ function createStars() {
   container.appendChild(frag);
 }
 
-// Remplir le menu déroulant des villes
 function populateCities() {
   const select = document.getElementById('city-select');
   CITIES.forEach((city, index) => {
@@ -747,21 +869,22 @@ function populateCities() {
 
 document.addEventListener('DOMContentLoaded', () => {
   createStars();
-  populateCities(); // Remplir la liste des villes
+  populateCities();
   tick();
   setInterval(tick, 1000);
 
-  // Événement de sélection de ville
   document.getElementById('city-select').addEventListener('change', (e) => {
     const index = parseInt(e.target.value, 10);
     if (!isNaN(index)) {
       const city = CITIES[index];
       state.location = { lat: city.lat, lng: city.lng };
-      hideManualForm();
-      hideError();
-      updateLocationDisplay(city.name);
-      refreshPrayerTimes();
+      hideManualForm(); hideError(); updateLocationDisplay(city.name); refreshPrayerTimes();
     }
+  });
+
+  document.getElementById('engine-select').addEventListener('change', (e) => {
+    state.engine = e.target.value;
+    refreshPrayerTimes();
   });
 
   document.getElementById('method-select').addEventListener('change', (e) => {
@@ -770,34 +893,17 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('relocate-btn').addEventListener('click', () => {
-    document.getElementById('city-select').value = ""; // Reset la ville
-    hideManualForm();
-    requestLocation();
+    document.getElementById('city-select').value = ""; hideManualForm(); requestLocation();
   });
 
   document.getElementById('manual-submit').addEventListener('click', () => {
     const lat = parseFloat(document.getElementById('manual-lat').value);
     const lng = parseFloat(document.getElementById('manual-lng').value);
-
-    if (isNaN(lat) || isNaN(lng)) {
-      showError("Veuillez saisir des valeurs numériques valides.");
-      return;
-    }
-    if (lat < -90 || lat > 90) {
-      showError("La latitude doit être comprise entre -90 et 90 degrés.");
-      return;
-    }
-    if (lng < -180 || lng > 180) {
-      showError("La longitude doit être comprise entre -180 et 180 degrés.");
-      return;
-    }
-
+    if (isNaN(lat) || isNaN(lng)) { showError("Valeurs numériques invalides."); return; }
+    if (lat < -90 || lat > 90) { showError("Latitude invalide."); return; }
+    if (lng < -180 || lng > 180) { showError("Longitude invalide."); return; }
     state.location = { lat, lng };
-    document.getElementById('city-select').value = ""; // Reset la ville
-    hideManualForm();
-    hideError();
-    updateLocationDisplay();
-    refreshPrayerTimes();
+    document.getElementById('city-select').value = ""; hideManualForm(); hideError(); updateLocationDisplay(); refreshPrayerTimes();
   });
 
   requestLocation();
